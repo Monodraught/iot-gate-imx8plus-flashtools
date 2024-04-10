@@ -4,11 +4,15 @@ from tkinter import filedialog
 from tkinter import messagebox
 import subprocess
 import threading
+import os
 
 class FlasherGUI:
     def __init__(self, root):
         self.root = root
         self.root.title("IMX8 Board Flasher")
+
+        # Get the directory of the Python script
+        self.script_dir = os.path.dirname(os.path.realpath(__file__))
 
         self.dram_conf = "d2d4"
         self.balena_image = tk.StringVar()
@@ -45,7 +49,10 @@ class FlasherGUI:
             messagebox.showerror("Error", "Balena Image is required.")
             return
 
-        cmd = f"./run_container.sh -d {self.dram_conf} -i {balena_image}"
+        # Construct the absolute path to the Bash script
+        bash_script_path = os.path.join(self.script_dir, "run_container.sh")
+        
+        cmd = f"{bash_script_path} -d {self.dram_conf} -i {balena_image}"
         if self.arch:
             cmd += f" -a {self.arch}"
 
@@ -85,14 +92,15 @@ class FlasherGUI:
             if arch.startswith("arm"):
                 if "armv7" in arch:
                     return "armv7"
-                elif "aarch64" in arch:
-                    return "aarch64"
                 else:
                     return "armv8"  # Assume ARMv8 if not explicitly armv7 or aarch64
             elif arch.startswith("x86"):
                 return "x86"
             else:
-                return arch  # Return actual architecture if not arm or x86
+                if "aarch64" in arch:
+                    return "armv7" # We need this for the Pi400 for some reason!
+                else:
+                    return arch  # Return actual architecture if not arm or x86
         except Exception as e:
             print("Error determining architecture:", e)
             return "Unknown"
