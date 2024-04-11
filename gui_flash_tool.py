@@ -66,12 +66,16 @@ class FlasherGUI:
         output_window = tk.Toplevel(self.root)
         output_window.title("Flash Output")
 
+        # Frame to contain the text widget
+        frame = ttk.Frame(output_window)
+        frame.pack(fill=tk.BOTH, expand=True)
+
         # Text widget to display output
-        output_text = tk.Text(output_window, wrap=tk.WORD, height=20, width=80)
-        output_text.pack(fill=tk.BOTH, expand=True)
+        output_text = tk.Text(frame, wrap=tk.WORD, height=20, width=80)
+        output_text.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
 
         # Scrollbar for the text widget
-        scrollbar = tk.Scrollbar(output_window, command=output_text.yview)
+        scrollbar = ttk.Scrollbar(frame, orient=tk.VERTICAL, command=output_text.yview)
         scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         output_text.config(yscrollcommand=scrollbar.set)
 
@@ -88,9 +92,26 @@ class FlasherGUI:
 
         if return_code != 0:
             error_message = f"Failed to flash the board.\n\nError message:\n{self.flash_process.stderr.read().decode()}"
-            messagebox.showerror("Error", error_message)
+            self.show_scrollable_error("Error", error_message)
         else:
             messagebox.showinfo("Success", "Board flashed successfully.")
+
+    def show_scrollable_error(self, title, message):
+        error_window = tk.Toplevel(self.root)
+        error_window.title(title)
+
+        # Text widget to display error message
+        error_text = tk.Text(error_window, wrap=tk.WORD, height=10, width=50)
+        error_text.pack(fill=tk.BOTH, expand=True)
+
+        # Scrollbar for the text widget
+        scrollbar = ttk.Scrollbar(error_window, orient=tk.VERTICAL, command=error_text.yview)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        error_text.config(yscrollcommand=scrollbar.set)
+
+        error_text.insert(tk.END, message)
+        error_text.config(state=tk.DISABLED)  # Disable editing of the error message
+
 
     def cancel_flashing(self):
         if self.flash_process and self.flash_process.poll() is None:
