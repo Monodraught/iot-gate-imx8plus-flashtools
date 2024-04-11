@@ -19,6 +19,8 @@ class FlasherGUI:
         if self.arch not in ["armv7", "armv8", "aarch64"]:
             self.arch = None  # Default to None if architecture is not recognized
 
+        self.script_path = None
+
         self.create_widgets()
 
     def create_widgets(self):
@@ -39,7 +41,6 @@ class FlasherGUI:
         if filename:
             self.balena_image.set(filename)
 
-
     def start_flashing(self):
         balena_image = self.balena_image.get()
 
@@ -47,33 +48,56 @@ class FlasherGUI:
             messagebox.showerror("Error", "Balena Image is required.")
             return
 
-        cmd = f"./run_container.sh -d {self.dram_conf} -i {balena_image}"
+        self.script_path = os.path.dirname(__file__)
+        script_path = os.path.join(os.path.dirname(__file__), "run_container.sh")
+        cmd = f"{script_path} -d {self.dram_conf} -i {balena_image}"
         if self.arch:
             cmd += f" -a {self.arch}"
+        
 
         self.flash_thread = threading.Thread(target=self.flash_board, args=(cmd,))
         self.flash_thread.start()
 
     def flash_board(self, cmd):
-        self.flash_process = subprocess.Popen(cmd, shell=True)
-        self.flash_process.wait()
-        if self.flash_process.returncode != 0:
-            self.root.after(0, lambda: messagebox.showerror("Error", "Failed to flash the board."))
-        else:
-            self.root.after(0, lambda: messagebox.showinfo("Success", "Board flashed successfully."))
+        print(cmd)
+        self.flash_process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=self.script_path)
+        
+        # Create a new window to display terminal output
+        output_window = tk.Toplevel(self.root)
+        output_window.title("Flash Output")
 
+        # Text widget to display output
+        output_text = tk.Text(output_window, wrap=tk.WORD, height=20, width=80)
+        output_text.pack(fill=tk.BOTH, expand=True)
+
+        # Scrollbar for the text widget
+        scrollbar = tk.Scrollbar(output_window, command=output_text.yview)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        output_text.config(yscrollcommand=scrollbar.set)
+
+        # Read and display the output from the subprocess
+        while True:
+            line = self.flash_process.stdout.readline()
+            if not line:
+                break
+            output_text.insert(tk.END, line.decode())
+            output_text.see(tk.END)
+        
+        self.flash_process.wait()
+        return_code = self.flash_process.returncode
+
+        if return_code != 0:
+            error_message = f"Failed to flash the board.\n\nError message:\n{self.flash_process.stderr.read().decode()}"
+            messagebox.showerror("Error", error_message)
+        else:
+            messagebox.showinfo("Success", "Board flashed successfully.")
 
     def cancel_flashing(self):
         if self.flash_process and self.flash_process.poll() is None:
             self.flash_process.terminate()
             messagebox.showinfo("Info", "Flashing process has been cancelled.")
-            self.root.after(100, self.show_cancel_message)  # Schedule the message to be shown
         else:
             messagebox.showinfo("Info", "No flashing process is currently running.")
-
-
-    def show_cancel_message(self):
-        messagebox.showerror("Error", "Flashing process was canceled by user.")
 
     def get_system_architecture(self):
         try:
