@@ -39,7 +39,7 @@ while [[ $# -gt 0 ]]; do
             ;;
         -a|--arch)
             if [ -z "$2" ]; then
-                log ERROR "\$1\" argument needs a value."
+                log ERROR "\"$1\" argument needs a value."
             fi
             arch=$2
             shift
