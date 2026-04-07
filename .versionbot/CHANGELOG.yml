@@ -1,4 +1,132 @@
 - commits:
+    - subject: "flash_iot_macos: address PR review feedback"
+      hash: b38b7830e81a6dbcc1cd8d8ad2c0605d9451f7ab
+      body: |
+        - Verify downloaded uuu binary integrity with pinned SHA256 checksum,
+          fail closed on mismatch
+        - Check for Xcode Command Line Tools before building uuu from source,
+          document prerequisite in README for Intel Macs
+        - Move ensure_root before TEMP_DIR creation so exec sudo doesn't
+          leak a temp directory from the non-root process
+        - Resolve brew path via eval "$(brew shellenv)" when not in PATH
+          (e.g. under sudo) and store BREW_PREFIX for consistent use
+        - Detach stale hdiutil attachments from previous failed runs before
+          attaching the image
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Shaun Mulligan <switchflip.shaun@gmail.com>
+        signed-off-by: Shaun Mulligan <switchflip.shaun@gmail.com>
+      author: Shaun Mulligan
+      nested: []
+    - subject: "flash_iot_macos: preserve original args for sudo re-exec"
+      hash: c8513317a1d897976eeccabfce99fd0a2982a5f7
+      body: |
+        The argument parsing loop shifts all positional parameters, so
+        $@ is empty by the time ensure_root is called. Save the original
+        args before parsing and use them for the sudo re-invocation.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Shaun Mulligan <switchflip.shaun@gmail.com>
+        signed-off-by: Shaun Mulligan <switchflip.shaun@gmail.com>
+      author: Shaun Mulligan
+      nested: []
+    - subject: "flash_iot_macos: add native macOS flash script"
+      hash: e614560739c840ce1cf41ee44718f2a5f9f6cf13
+      body: |
+        Docker Desktop for macOS cannot pass USB devices through to the
+        hypervisor, making the containerized flashing approach impossible.
+        This adds flash_iot_macos.sh which runs directly on the host using
+        NXP's uuu tool to flash the bootloader and OS image to eMMC over USB.
+
+        Supports Apple Silicon (pre-built uuu binary) and Intel Macs
+        (builds uuu from source). Updates README to document both Linux
+        and macOS provisioning workflows.
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Shaun Mulligan <switchflip.shaun@gmail.com>
+        signed-off-by: Shaun Mulligan <switchflip.shaun@gmail.com>
+      author: Shaun Mulligan
+      nested: []
+  version: 0.2.0
+  title: ""
+  date: 2026-03-12T14:38:35.272Z
+- commits:
+    - subject: "Dockerfile: add tinyxml dependency"
+      hash: 82426e11edd87bc9b3f66d4d37b2d49be3aae593
+      body: |
+        This is required on the latest version.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Alex Gonzalez <alexg@balena.io>
+        signed-off-by: Alex Gonzalez <alexg@balena.io>
+      author: Alex Gonzalez
+      nested: []
+  version: 0.1.1
+  title: ""
+  date: 2025-04-24T14:47:17.000Z
+- commits:
+    - subject: "Dockerfile: update mfgtools to latest"
+      hash: 37194f17c7d15e7c8094d4e00fed583f481f626b
+      body: |
+        This is 10 commits above the latest upstream tag uuu_1.5.201.
+      footer:
+        Change-type: minor
+        change-type: minor
+        Signed-off-by: Alex Gonzalez <alexg@balena.io>
+        signed-off-by: Alex Gonzalez <alexg@balena.io>
+      author: Alex Gonzalez
+      nested: []
+  version: 0.1.0
+  title: ""
+  date: 2025-04-24T14:09:47.493Z
+- commits:
+    - subject: Allow to use with flasher images
+      hash: a1f88c862acd200739aad8f9d351ae574fec8798
+      body: >
+        By removing the logging message that prints the OS version from
+        `/mnt/boot/os-release` the script
+
+        works also to program flaher images.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Alex Gonzalez <alexg@balena.io>
+        signed-off-by: Alex Gonzalez <alexg@balena.io>
+      author: Alex Gonzalez
+  version: 0.0.5
+  title: ""
+  date: 2024-11-06T16:09:25.400Z
+- commits:
+    - subject: "run_container: Fix typo"
+      hash: 414525e0cda52d8be3a358f38669403d93b57282
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Alexandru Costache <alexandru@balena.io>
+        signed-off-by: Alexandru Costache <alexandru@balena.io>
+      author: Alexandru Costache
+  version: 0.0.4
+  title: ""
+  date: 2024-07-30T07:42:51.969Z
+- commits:
+    - subject: "iot-gate-imx8plus: Add aarch64 build option for container"
+      hash: c8ea4d28a2af518e4efe8591eb391abe3349919d
+      body: ""
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Alexandru Costache <alexandru@balena.io>
+        signed-off-by: Alexandru Costache <alexandru@balena.io>
+      author: Alexandru Costache
+  version: 0.0.3
+  title: ""
+  date: 2024-05-13T14:09:07.487Z
+- commits:
     - subject: "README: Add arch option details to documentation"
       hash: 7e715b87d1e19856729c09d09f469292eb54d66c
       body: ""
