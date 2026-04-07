@@ -53,7 +53,7 @@ class FlasherGUI:
         cmd = f"{script_path} -d {self.dram_conf} -i {balena_image}"
         if self.arch:
             cmd += f" -a {self.arch}"
-        
+
 
         self.flash_thread = threading.Thread(target=self.flash_board, args=(cmd,))
         self.flash_thread.start()
@@ -61,7 +61,7 @@ class FlasherGUI:
     def flash_board(self, cmd):
         print(cmd)
         self.flash_process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=self.script_path)
-        
+
         # Create a new window to display terminal output
         output_window = tk.Toplevel(self.root)
         output_window.title("Flash Output")
@@ -86,7 +86,7 @@ class FlasherGUI:
                 break
             output_text.insert(tk.END, line.decode())
             output_text.see(tk.END)
-        
+
         self.flash_process.wait()
         return_code = self.flash_process.returncode
 
