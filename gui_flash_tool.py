@@ -11,7 +11,6 @@ class FlasherGUI:
         self.root = root
         self.root.title("IMX8 Board Flasher")
 
-        self.dram_conf = "d2d4"
         self.balena_image = tk.StringVar()
         self.flash_thread = None  # Thread for the flashing process
 
@@ -50,7 +49,7 @@ class FlasherGUI:
 
         self.script_path = os.path.dirname(__file__)
         script_path = os.path.join(os.path.dirname(__file__), "run_container.sh")
-        cmd = f"{script_path} -d {self.dram_conf} -i {balena_image}"
+        cmd = f"{script_path} -i {balena_image}"
         if self.arch:
             cmd += f" -a {self.arch}"
 
@@ -132,7 +131,7 @@ class FlasherGUI:
                 return "x86"
             else:
                 if "aarch64" in arch:
-                    return "armv7" # For some reason we need this on the Pi400
+                    return "aarch64"
                 return arch  # Return actual architecture if not arm or x86
         except Exception as e:
             print("Error determining architecture:", e)
