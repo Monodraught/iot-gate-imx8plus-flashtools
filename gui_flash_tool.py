@@ -11,7 +11,6 @@ class FlasherGUI:
         self.root = root
         self.root.title("IMX8 Board Flasher")
 
-        self.dram_conf = "d2d4"
         self.balena_image = tk.StringVar()
         self.flash_thread = None  # Thread for the flashing process
 
@@ -37,7 +36,7 @@ class FlasherGUI:
 
     def browse_image(self):
         initial_dir = os.getcwd()  # Get the current working directory
-        filename = filedialog.askopenfilename(initialdir=initial_dir, filetypes=[("Balena Images", "*.img")])
+        filename = filedialog.askopenfilename(initialdir=initial_dir, filetypes=[("Balena Images", "*.balenaos-img *.img")])
         if filename:
             self.balena_image.set(filename)
 
@@ -50,10 +49,10 @@ class FlasherGUI:
 
         self.script_path = os.path.dirname(__file__)
         script_path = os.path.join(os.path.dirname(__file__), "run_container.sh")
-        cmd = f"{script_path} -d {self.dram_conf} -i {balena_image}"
+        cmd = f"{script_path} -i {balena_image}"
         if self.arch:
             cmd += f" -a {self.arch}"
-        
+
 
         self.flash_thread = threading.Thread(target=self.flash_board, args=(cmd,))
         self.flash_thread.start()
@@ -61,7 +60,7 @@ class FlasherGUI:
     def flash_board(self, cmd):
         print(cmd)
         self.flash_process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=self.script_path)
-        
+
         # Create a new window to display terminal output
         output_window = tk.Toplevel(self.root)
         output_window.title("Flash Output")
@@ -86,7 +85,7 @@ class FlasherGUI:
                 break
             output_text.insert(tk.END, line.decode())
             output_text.see(tk.END)
-        
+
         self.flash_process.wait()
         return_code = self.flash_process.returncode
 
@@ -132,7 +131,7 @@ class FlasherGUI:
                 return "x86"
             else:
                 if "aarch64" in arch:
-                    return "armv7" # For some reason we need this on the Pi400
+                    return "aarch64"
                 return arch  # Return actual architecture if not arm or x86
         except Exception as e:
             print("Error determining architecture:", e)
