@@ -48,7 +48,7 @@ trap cleanup EXIT SIGHUP SIGINT SIGTERM
 
 # Extract balenaOS imx-boot
 if [ -d ${balena_image} ]; then
-	log ERROR "Provided path ${balena_image} is a directory or an inexistent file path. This can happen when passing an incorrect path do the flashing script inside docker."
+	log ERROR "Provided path ${balena_image} is a directory or an inexistent file path. This can happen when passing an incorrect path to the flashing script inside docker."
 fi
 
 balena_image_loop_dev="$(losetup -fP --show "${balena_image}")"

@@ -15,29 +15,36 @@ The scripts in this directory allow simplified provisioning of balenaOS images f
 
 ## About
 
-These tools unpack u-boot from the specified balenaOS image and provision both this bootloader and the OS image to
-a device connected to your host via USB.
-
-Two provisioning methods are available:
+These tools run a Docker container to unpack u-boot from the specified balenaOS image and provision both this bootloader and the OS image to
+a device connected to your HOST.
 
 - **Linux**: Docker-container-based tool (`run_container.sh`) — runs a privileged container with USB device access
 - **macOS**: Native script (`flash_iot_macos.sh`) — runs directly on the host using NXP's [uuu](https://github.com/nxp-imx/mfgtools) tool
 
-## Recovery mode
+## Required software
 
-Make sure your IOT device is not powered. Connect the microUSB port labeled "PROG" from your IOT device to your host.
+TKinter install `sudo apt install python3-tk`
 
-Apply power to the device. The green LED located on the front of the device should light up.
+## How to use
 
-**Linux:**
+Please follow the steps below to enter Recovery mode and perform provisioning of your Compulab IOT-GATE-iMX8PLUS with balenaOS
+
+### Recovery mode
+
+Make sure your IOT-GATE-iMX8 is not powered. Connect the microUSB port labeled 'PROG" from your IOT-GATE-iMX8PLUS to your Host PC.
+
+Apply power to the device. The green LED located on the front of the device should light up. `lsusb` should show a device similar to:
+
 ```
 $ lsusb | grep NXP
-Bus 001 Device 012: ID 1fc9:0146 NXP Semiconductors SE Blank 865
+Bus 001 Device 012: ID 1fc9:0146 NXP Semiconductors SE Blank 865 
 ```
 
-**macOS:**
+or
+
 ```
-$ system_profiler SPUSBDataType | grep -i 1fc9
+root@5ea9a9133c3a:/usr/src/app# lsusb | grep NXP
+Bus 001 Device 012: ID 1fc9:0146 NXP Semiconductors 
 ```
 
 Check the RAM size option of your device and ensure you have downloaded and unzipped the balenaOS image which corresponds to your board's DRAM configuration.
@@ -84,46 +91,8 @@ root@5ea9a9133c3a:/usr/src/app# ./flash_iot.sh -i /data/images/<balena-os.img>
 ```
 
 By default the container image is built to run on x86 hosts. If you would like to build and run the container image on an armv7 device, please use `./run_container.sh -a armv7 ...`.
-The same, aarch64 devices can build and run the container by running `./run_container.sh -a aarch64 ...`. The `aarch64` configuration is reported to work from Ubuntu in Parallels on Apple M3 Silicon.
+The same, aarch64 devices can build and run the container by running `./run_container.sh -a aarch64 ...`.
 
-## macOS provisioning
-
-Docker Desktop for macOS cannot pass USB devices through to the hypervisor, so a native script is provided instead.
-
-### Required software
-
-- [Homebrew](https://brew.sh)
-- Xcode Command Line Tools (Intel Macs only — needed to build `uuu` from source): `xcode-select --install`
-- libusb (installed automatically)
-- uuu (installed automatically)
-
-### Setup
-
-Install dependencies (run once, without `sudo`):
-
-```
-$ ./flash_iot_macos.sh --install-deps
-```
-
-On Apple Silicon Macs, this downloads a pre-built `uuu` binary from [NXP's mfgtools releases](https://github.com/nxp-imx/mfgtools/releases). On Intel Macs, no pre-built binary is available, so `uuu` is built from source automatically (requires Xcode Command Line Tools).
-
-### Usage
-
-Put the device into recovery mode (see above), then flash:
-
-```
-$ sudo ./flash_iot_macos.sh -i ~/Downloads/balena-cloud-iot-gate-imx8plus.img
-```
-
-Compressed images (`.img.gz`, `.img.zip`) are also supported.
-
-To use a custom bootloader binary instead of extracting one from the image:
-
-```
-$ sudo ./flash_iot_macos.sh -i <balena-os.img> -b <imx-boot-binary>
-```
-
-Run `./flash_iot_macos.sh -h` for all options.
 
 ## Support
 
