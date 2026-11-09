@@ -36,7 +36,7 @@ class FlasherGUI:
 
     def browse_image(self):
         initial_dir = os.getcwd()  # Get the current working directory
-        filename = filedialog.askopenfilename(initialdir=initial_dir, filetypes=[("Balena Images", "*.balenaos-img *.img")])
+        filename = filedialog.askopenfilename(initialdir=initial_dir, filetypes=[("Balena Images", "*.balenaos-img *.balena-img *.img")])
         if filename:
             self.balena_image.set(filename)
 
